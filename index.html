@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetroFlow | Premium Oil Arbitrage & Refining</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media', // Automatically switches based on device theme settings
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass-shadow: rgba(0, 0, 0, 0.05);
+            --hero-bg: radial-gradient(circle at 50% -20%, #fef3c7 0%, #f8fafc 60%);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --glass-bg: rgba(255, 255, 255, 0.03);
+                --glass-border: rgba(255, 255, 255, 0.1);
+                --glass-shadow: rgba(0, 0, 0, 0.8);
+                --hero-bg: radial-gradient(circle at 50% -20%, #221f10 0%, #0a0a0c 60%);
+            }
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 var(--glass-shadow);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-mesh { background: var(--hero-bg); }
+
+        #landing-page {
+            background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.92), rgba(248, 250, 252, 1)), url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=2670&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            #landing-page {
+                background-image: linear-gradient(to bottom, rgba(10,10,12,0.92), rgba(10,10,12,1)), url('https://images.unsplash.com/photo-1516937941344-00b4e0337589?q=80&w=2670&auto=format&fit=crop');
+            }
+        }
+
+        #loader { display: none; }
+        .loading #loader { display: flex; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .section-transition { transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .hidden-section { display: none !important; }
+
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(128,128,128,0.05);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 10px 0;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 35s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-[#0a0a0c] text-gray-800 dark:text-gray-200 hero-mesh transition-colors duration-500">
+
+    <div id="loader" class="fixed inset-0 z-[110] bg-white/90 dark:bg-black/90 flex flex-col items-center justify-center backdrop-blur-sm">
+        <div class="relative">
+            <div class="w-20 h-20 border-2 border-yellow-200 dark:border-yellow-900 rounded-full"></div>
+            <div class="absolute inset-0 w-20 h-20 border-t-2 border-yellow-500 rounded-full animate-spin"></div>
+        </div>
+        <p class="mt-6 tracking-[0.3em] text-yellow-600 dark:text-yellow-500 text-xs font-bold uppercase">Validating Protocol</p>
+    </div>
+
+    <section id="landing-page" class="section-transition min-h-screen">
+        <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto sticky top-0 z-50">
+            <div class="text-2xl font-extrabold tracking-tighter text-gray-900 dark:text-white">PETRO<span class="text-yellow-500">FLOW</span></div>
+            <div class="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                <a href="#founder" class="hover:text-yellow-500 transition">Founder</a>
+                <a href="#infrastructure" class="hover:text-yellow-500 transition">Infrastructure</a>
+                <a href="#faq" class="hover:text-yellow-500 transition">FAQ</a>
+            </div>
+            <button onclick="showAuth()" class="glass px-6 py-2 rounded-full text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/10 transition text-gray-900 dark:text-white">Launch Portal</button>
+        </nav>
+
+        <div class="ticker-wrap">
+            <div class="ticker text-[10px] font-mono text-yellow-600 dark:text-yellow-500/70 tracking-widest uppercase">
+                BRENT CRUDE: $82.44 (+1.2%) &nbsp;&nbsp;•&nbsp;&nbsp; WTI CRUDE: $78.12 (+0.8%) &nbsp;&nbsp;•&nbsp;&nbsp; DIESEL SPOT: ₦1,240.00 &nbsp;&nbsp;•&nbsp;&nbsp; JET-A1: ₦1,150.00 &nbsp;&nbsp;•&nbsp;&nbsp; MARGIN: +14.2% &nbsp;&nbsp;•&nbsp;&nbsp; ACTIVE CONTRACTS: 1,248 &nbsp;&nbsp;•&nbsp;&nbsp;
+                BRENT CRUDE: $82.44 (+1.2%) &nbsp;&nbsp;•&nbsp;&nbsp; WTI CRUDE: $78.12 (+0.8%) &nbsp;&nbsp;•&nbsp;&nbsp; DIESEL SPOT: ₦1,240.00 &nbsp;&nbsp;•&nbsp;&nbsp; JET-A1: ₦1,150.00 &nbsp;&nbsp;•&nbsp;&nbsp; MARGIN: +14.2% &nbsp;&nbsp;•&nbsp;&nbsp;
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 py-24 lg:py-32 grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <div class="inline-flex items-center gap-2 glass px-4 py-1 rounded-full mb-6 text-sm text-yellow-600 dark:text-yellow-500 border-yellow-500/20">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+                    </span>
+                    Institutional Arbitrage Live
+                </div>
+                <h1 class="text-6xl lg:text-8xl font-extrabold leading-tight mb-8 text-gray-900 dark:text-white">
+                    Refining <span class="gold-gradient">Wealth.</span>
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400 text-xl mb-10 max-w-md leading-relaxed">
+                    A premier energy arbitrage ecosystem. Securely participate in the high-yield cycle of crude acquisition, refining, and global distribution.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="showAuth()" class="bg-yellow-500 text-black px-10 py-5 rounded-2xl font-bold hover:scale-105 transition shadow-2xl shadow-yellow-500/20">Start Investing</button>
+                    <button class="glass text-gray-900 dark:text-white px-10 py-5 rounded-2xl font-bold hover:bg-black/5 dark:hover:bg-white/5">View Assets</button>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <div class="glass p-8 rounded-[3rem] relative z-10 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1542289650-61d02c487109?q=80&w=800&auto=format&fit=crop" class="w-full h-64 object-cover rounded-2xl mb-8 opacity-80 dark:opacity-60">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center text-xs font-mono text-yellow-600 dark:text-yellow-500">
+                            <span>CYCLE STATUS</span>
+                            <span>ACTIVE</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-white/5 h-2 rounded-full overflow-hidden">
+                            <div class="bg-yellow-500 h-full w-2/3"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed">Refining Delta Sweet Crude into Premium Motor Spirit (PMS). Estimated completion: 8 Days.</p>
+                    </div>
+                </div>
+                <div class="absolute -top-10 -right-10 w-64 h-64 bg-yellow-500/20 dark:bg-yellow-500/10 blur-[100px] -z-0"></div>
+            </div>
+        </div>
+
+        <section id="infrastructure" class="max-w-7xl mx-auto px-6 py-20">
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white text-center mb-16">Platform <span class="text-yellow-500">Infrastructure</span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-3xl hover:border-yellow-500/40 dark:hover:border-yellow-500/20 transition">
+                    <div class="w-12 h-12 bg-yellow-500/20 dark:bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-600 dark:text-yellow-500 mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-width="2"/></svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Secured Capital</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-500 leading-relaxed">Every investment is collateralized by physical crude oil reserves held in our partner storage farms.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl hover:border-yellow-500/40 dark:hover:border-yellow-500/20 transition">
+                    <div class="w-12 h-12 bg-yellow-500/20 dark:bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-600 dark:text-yellow-500 mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2"/></svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-4">High Frequency</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-500 leading-relaxed">Our automated arbitrage bot monitors Brent and WTI price gaps to execute acquisitions at millisecond precision.</p>
+                </div>
+                <div class="glass p-8 rounded-3xl hover:border-yellow-500/40 dark:hover:border-yellow-500/20 transition">
+                    <div class="w-12 h-12 bg-yellow-500/20 dark:bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-600 dark:text-yellow-500 mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0-2.08-.402-2.599-1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Guaranteed Liquidity</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-500 leading-relaxed">Instant withdrawals enabled by our ₦5.2B liquidity pool, ensuring you are never locked out of your funds.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="p-12 border-t border-gray-200 dark:border-white/5 text-center mt-10">
+            <div class="text-xl font-bold mb-4 text-gray-900 dark:text-white">PETRO<span class="text-yellow-500">FLOW</span></div>
+            <p class="text-xs text-gray-500 dark:text-gray-600 max-w-lg mx-auto mb-8">
+                &copy; 2026 PetroFlow Arbitrage Group. Licensed for Energy Trading. Market risks apply.
+            </p>
+        </footer>
+    </section>
+
+    <section id="auth-screen" class="section-transition hidden-section min-h-screen flex items-center justify-center p-4">
+        <div class="glass p-8 md:p-10 rounded-[2rem] w-full max-w-md relative overflow-hidden shadow-2xl">
+            <div class="relative z-10">
+                <h2 id="auth-title" class="text-3xl font-bold mb-2 text-center text-gray-900 dark:text-white">Access Portal</h2>
+                <p class="text-gray-500 text-center mb-8 text-sm">Secure biometric-grade encryption active.</p>
+                
+                <div class="space-y-4">
+                    <input type="email" id="user-email" placeholder="Email Address" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none transition text-gray-900 dark:text-white shadow-inner">
+                    <input type="password" id="password" placeholder="Refinery Passcode" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none transition text-gray-900 dark:text-white shadow-inner">
+                    <button onclick="handleAuth()" id="auth-btn" class="w-full bg-yellow-500 text-black py-4 rounded-xl font-bold uppercase tracking-widest mt-4 hover:bg-yellow-400 transition shadow-lg shadow-yellow-500/20">Login to Vault</button>
+                </div>
+                <p class="mt-6 text-center text-sm text-gray-500">
+                    <span id="toggle-text">New to PetroFlow?</span>
+                    <button onclick="toggleAuth()" id="toggle-btn" class="text-yellow-600 dark:text-yellow-500 ml-1 hover:underline font-bold">Register Account</button>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section id="dashboard" class="section-transition hidden-section min-h-screen p-4 lg:p-10">
+        <div class="max-w-7xl mx-auto">
+            <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-gray-200 dark:border-white/5 pb-6">
+                <div>
+                    <h2 class="text-sm text-gray-500 font-bold uppercase tracking-widest">Active Portfolio</h2>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-[200px] md:max-w-xs">Investor: <span id="user-display" class="text-yellow-500"></span></h1>
+                </div>
+                <button onclick="location.reload()" class="glass px-5 py-2.5 rounded-xl text-xs font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition">Exit Portal</button>
+            </header>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-1/3 space-y-6 lg:sticky lg:top-10 h-fit">
+                    <div class="glass p-8 rounded-[2.5rem] border-yellow-500/30 dark:border-yellow-500/20 bg-gradient-to-br from-white to-transparent dark:from-white/5">
+                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Net Balance</span>
+                        <div class="text-4xl xl:text-5xl font-black mt-2 text-gray-900 dark:text-white break-words">₦<span id="balance-display">0.00</span></div>
+                        <div class="mt-8 space-y-3">
+                            <button onclick="openModal('deposit-modal')" class="w-full bg-gray-900 text-white dark:bg-white dark:text-black py-4 rounded-2xl font-bold hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:text-black transition shadow-lg">Deposit Funds</button>
+                            <button onclick="openModal('withdraw-modal')" class="w-full glass py-4 rounded-2xl font-bold text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition">Request Payout</button>
+                            <button onclick="openHistoryModal()" class="w-full glass py-4 rounded-2xl font-bold text-yellow-600 dark:text-yellow-500 border border-yellow-500/20 hover:bg-yellow-500/10 transition">Transaction Histories</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-2/3">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Available Refining Tiers</h3>
+                    <div id="plans-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="deposit-modal" class="fixed inset-0 z-[100] bg-black/60 dark:bg-black/90 hidden flex-col items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="glass bg-white/90 dark:bg-transparent p-6 sm:p-8 rounded-[2rem] w-full max-w-md shadow-2xl relative">
+            <button onclick="closeModal('deposit-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold text-xl">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Deposit Funds</h3>
+            
+            <div class="bg-gray-100 dark:bg-white/5 p-4 rounded-xl mb-6 border border-gray-200 dark:border-white/10">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-widest font-bold">Transfer Destination</p>
+                <div class="mt-3 space-y-1">
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Bank Name: <span class="text-gray-900 dark:text-white font-bold ml-1">Petro Finance Bank</span></p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Account Name: <span class="text-gray-900 dark:text-white font-bold ml-1">PetroFlow Arbitrage</span></p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">Account No: <span class="text-yellow-600 dark:text-yellow-500 font-bold ml-1 text-lg tracking-wider">9081726354</span></p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <input type="number" id="dep-amount" placeholder="Amount Sent (₦)" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none text-gray-900 dark:text-white transition shadow-inner">
+                <div class="relative">
+                    <label class="block text-xs text-gray-500 dark:text-gray-400 mb-2 font-bold uppercase">Upload Payment Receipt</label>
+                    <input type="file" id="dep-receipt" accept="image/*,.pdf" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-3 rounded-xl text-gray-600 dark:text-gray-400 outline-none file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-yellow-500 file:text-black hover:file:bg-yellow-400 cursor-pointer">
+                </div>
+                <button onclick="submitDeposit()" class="w-full bg-yellow-500 text-black py-4 rounded-xl font-bold uppercase tracking-widest mt-2 hover:bg-yellow-400 transition shadow-lg shadow-yellow-500/20">Confirm Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="withdraw-modal" class="fixed inset-0 z-[100] bg-black/60 dark:bg-black/90 hidden flex-col items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="glass bg-white/90 dark:bg-transparent p-6 sm:p-8 rounded-[2rem] w-full max-w-md shadow-2xl relative">
+            <button onclick="closeModal('withdraw-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold text-xl">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Request Payout</h3>
+            
+            <div id="withdraw-form" class="space-y-4">
+                <input type="number" id="with-amount" placeholder="Amount to Withdraw (₦)" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none text-gray-900 dark:text-white transition shadow-inner">
+                <input type="text" id="with-bank" placeholder="Receiving Bank Name" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none text-gray-900 dark:text-white transition shadow-inner">
+                <input type="number" id="with-acc-no" placeholder="Account Number" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none text-gray-900 dark:text-white transition shadow-inner">
+                <input type="text" id="with-acc-name" placeholder="Account Name" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-xl focus:border-yellow-500 outline-none text-gray-900 dark:text-white transition shadow-inner">
+                
+                <button onclick="submitWithdraw()" class="w-full bg-gray-900 text-white dark:bg-white dark:text-black py-4 rounded-xl font-bold uppercase tracking-widest mt-2 hover:bg-gray-800 dark:hover:bg-gray-200 transition shadow-lg">Process Payout</button>
+            </div>
+
+            <div id="withdraw-success" class="hidden flex-col items-center py-6 text-center">
+                <div class="w-20 h-20 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500 rounded-full flex items-center justify-center mb-6 border border-green-200 dark:border-green-500/30">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h4 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Payout Approved</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-8">Funds have been successfully routed to your local bank account.</p>
+                <div class="w-full space-y-3">
+                    <button onclick="downloadReceipt()" class="w-full bg-yellow-500 text-black py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-yellow-400 transition shadow-lg shadow-yellow-500/20">Download Receipt</button>
+                    <button onclick="closeModal('withdraw-modal')" class="w-full glass py-4 rounded-xl font-bold text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition border border-gray-200 dark:border-white/10">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-modal" class="fixed inset-0 z-[100] bg-black/60 dark:bg-black/90 hidden flex-col items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="glass bg-white/90 dark:bg-transparent p-6 sm:p-8 rounded-[2rem] w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl relative">
+            <button onclick="closeModal('history-modal')" class="absolute top-6 right-6 text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold text-xl">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Transaction Histories</h3>
+            
+            <div id="history-list" class="overflow-y-auto pr-2 space-y-3 flex-1 scrollbar-hide">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+        let user = null;
+        let currentReceiptData = "";
+
+        // 10 Investment Plans Definition
+        const investmentPlans = [
+            { name: "Starter Crude", price: 2000, rate: 0.05, returnText: "5% Daily" },
+            { name: "Micro Refinery", price: 5000, rate: 0.06, returnText: "6% Daily" },
+            { name: "Mini Delta", price: 10000, rate: 0.07, returnText: "7% Daily" },
+            { name: "Lagos Sweet", price: 25000, rate: 0.08, returnText: "8% Daily" },
+            { name: "Standard Pipeline", price: 50000, rate: 0.09, returnText: "9% Daily" },
+            { name: "Premium Reserve", price: 100000, rate: 0.10, returnText: "10% Daily" },
+            { name: "Delta Complex", price: 250000, rate: 0.11, returnText: "11% Daily" },
+            { name: "Offshore Rig", price: 500000, rate: 0.12, returnText: "12% Daily" },
+            { name: "Global Export", price: 1000000, rate: 0.13, returnText: "13% Daily" },
+            { name: "Inst. Arbitrage", price: 5000000, rate: 0.15, returnText: "15% Daily" }
+        ];
+
+        function navigate(toId) {
+            const sections = ['landing-page', 'auth-screen', 'dashboard'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if(id === toId) {
+                    el.classList.remove('hidden-section');
+                } else {
+                    el.classList.add('hidden-section');
+                }
+            });
+            window.scrollTo(0,0);
+        }
+
+        function showLoading(cb) {
+            document.body.classList.add('loading');
+            setTimeout(() => {
+                document.body.classList.remove('loading');
+                if(cb) cb();
+            }, 1500);
+        }
+
+        function showAuth() { navigate('auth-screen'); }
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            document.getElementById('auth-title').innerText = isLogin ? 'Access Portal' : 'Create Vault';
+            document.getElementById('auth-btn').innerText = isLogin ? 'Login to Vault' : 'Initialize Account';
+            document.getElementById('toggle-text').innerText = isLogin ? 'New to PetroFlow?' : 'Already have a vault?';
+            document.getElementById('toggle-btn').innerText = isLogin ? 'Register Account' : 'Login';
+        }
+
+        function handleAuth() {
+            const email = document.getElementById('user-email').value;
+            const p = document.getElementById('password').value;
+            
+            if(!email || !p || !email.includes('@')) return alert("Valid Email and Passcode required.");
+
+            showLoading(() => {
+                if(isLogin) {
+                    const saved = JSON.parse(localStorage.getItem(email));
+                    if(saved && saved.p === p) {
+                        user = saved;
+                        loginSuccess();
+                    } else alert("Authorization Failed.");
+                } else {
+                    if(localStorage.getItem(email)) return alert("Email already registered.");
+                    const data = { email, p, balance: 0, transactions: [], activeInvestments: [] };
+                    localStorage.setItem(email, JSON.stringify(data));
+                    alert("Account Initialized successfully.");
+                    toggleAuth();
+                }
+            });
+        }
+
+        function loginSuccess() {
+            if(!user.transactions) user.transactions = [];
+            if(!user.activeInvestments) user.activeInvestments = []; 
+            document.getElementById('user-display').innerText = user.email.split('@')[0];
+            
+            renderPlans();
+            calculateAccruals();
+            updateBalance();
+            navigate('dashboard');
+            
+            // Re-calculate accruals continuously every 10 seconds for visual feedback
+            setInterval(calculateAccruals, 10000); 
+        }
+
+        function updateBalance() {
+            document.getElementById('balance-display').innerText = user.balance.toLocaleString('en-NG', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            localStorage.setItem(user.email, JSON.stringify(user));
+        }
+
+        // --- NEW ACCRUAL LOGIC ---
+        function calculateAccruals() {
+            if (!user.activeInvestments || user.activeInvestments.length === 0) return;
+            const now = Date.now();
+            let hasChanges = false;
+            let newlyEarned = 0;
+            
+            user.activeInvestments.forEach(inv => {
+                const msPassed = now - inv.lastAccrual;
+                const daysPassed = msPassed / (1000 * 60 * 60 * 24); // Convert ms to fractional days
+                
+                // If enough time passed (even fractions of a day), add earnings
+                if (daysPassed > 0.0001) { 
+                    const earned = (inv.amount * inv.rate) * daysPassed;
+                    newlyEarned += earned;
+                    inv.lastAccrual = now;
+                    hasChanges = true;
+                }
+            });
+
+            if (hasChanges && newlyEarned > 0) {
+                user.balance += newlyEarned;
+                updateBalance();
+            }
+        }
+
+        function renderPlans() {
+            const grid = document.getElementById('plans-grid');
+            grid.innerHTML = investmentPlans.map((p, i) => `
+                <div class="glass p-5 md:p-6 rounded-3xl border-gray-200 dark:border-white/5 group hover:border-yellow-500/50 transition relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-6">
+                        <span class="text-[10px] bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 px-3 py-1 rounded-full font-bold uppercase tracking-wider">${p.returnText}</span>
+                    </div>
+                    <h4 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate pr-2">${p.name}</h4>
+                    <p class="text-gray-500 text-xs mb-6 font-medium">Continuous Daily Accrual</p>
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                        <span class="font-bold text-gray-900 dark:text-white text-lg">₦${p.price.toLocaleString()}</span>
+                        <button onclick="invest(${i})" class="bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 px-4 py-2 rounded-xl font-bold text-sm hover:bg-yellow-500 hover:text-black transition">Activate</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- MODAL CONTROLS ---
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            if(id === 'withdraw-modal') {
+                document.getElementById('withdraw-form').classList.remove('hidden');
+                document.getElementById('withdraw-success').classList.add('hidden');
+                document.getElementById('withdraw-success').classList.remove('flex');
+                ['with-amount', 'with-bank', 'with-acc-no', 'with-acc-name'].forEach(inp => document.getElementById(inp).value = '');
+            }
+            if(id === 'deposit-modal') {
+                document.getElementById('dep-amount').value = '';
+                document.getElementById('dep-receipt').value = '';
+            }
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitDeposit() {
+            const amt = document.getElementById('dep-amount').value;
+            const receipt = document.getElementById('dep-receipt').files[0];
+
+            if(!amt || amt <= 0) return alert("Please enter a valid amount.");
+            if(!receipt) return alert("Please upload your payment receipt for verification.");
+
+            alert("Receipt uploaded successfully! Your funds are being verified and will reflect in exactly 5 minutes.");
+            closeModal('deposit-modal');
+
+            // 5 minutes timer (300000 milliseconds)
+            setTimeout(() => {
+                user.balance += parseFloat(amt);
+                user.transactions.push({ 
+                    type: 'Deposit', 
+                    amount: parseFloat(amt), 
+                    date: new Date().toLocaleString(),
+                    details: 'Bank Transfer Validated'
+                });
+                updateBalance();
+                alert(`Your deposit of ₦${parseFloat(amt).toLocaleString('en-NG', {minimumFractionDigits: 2})} has been confirmed and added!`);
+            }, 300000); 
+        }
+
+        function submitWithdraw() {
+            const amt = parseFloat(document.getElementById('with-amount').value);
+            const bank = document.getElementById('with-bank').value;
+            const accNo = document.getElementById('with-acc-no').value;
+            const accName = document.getElementById('with-acc-name').value;
+
+            if(!amt || !bank || !accNo || !accName) return alert("Please securely fill all withdrawal fields.");
+            if(amt > user.balance) return alert("Insufficient Liquidity in your vault.");
+
+            showLoading(() => {
+                calculateAccruals(); // Final calc before debit
+                user.balance -= amt;
+                const dateStr = new Date().toLocaleString();
+                
+                user.transactions.push({ 
+                    type: 'Payout', 
+                    amount: amt, 
+                    date: dateStr, 
+                    details: `To: ${accName} | ${bank} (${accNo})` 
+                });
+                updateBalance();
+
+                currentReceiptData = `PETROFLOW ARBITRAGE VAULT\n================================\nOFFICIAL TRANSACTION RECEIPT\n\nTransaction Type: Payout / Withdrawal\nStatus: APPROVED & SUCCESSFUL\nAmount Disbursed: ₦${amt.toLocaleString('en-NG', {minimumFractionDigits: 2})}\nDate & Time: ${dateStr}\n\nRECIPIENT BANKING DETAILS:\n--------------------------------\nAccount Name: ${accName}\nBank Institution: ${bank}\nAccount Number: ${accNo}\n================================\nSecurity Hash: ${Math.random().toString(36).substring(2, 15)}\nThank you for trusting PetroFlow Infrastructure.`;
+
+                document.getElementById('withdraw-form').classList.add('hidden');
+                document.getElementById('withdraw-success').classList.remove('hidden');
+                document.getElementById('withdraw-success').classList.add('flex');
+            });
+        }
+
+        function downloadReceipt() {
+            const blob = new Blob([currentReceiptData], {type: 'text/plain'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PetroFlow_Payout_Receipt_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function openHistoryModal() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            
+            if(!user.transactions || user.transactions.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 py-10 text-sm">No transaction records found in your vault.</p>';
+            } else {
+                for(let i = user.transactions.length - 1; i >= 0; i--) {
+                    const tx = user.transactions[i];
+                    const isDep = tx.type === 'Deposit';
+                    const isWith = tx.type === 'Payout';
+                    
+                    let colorClass = 'text-yellow-600 dark:text-yellow-400'; 
+                    let sign = '-';
+                    if (isDep) { colorClass = 'text-green-600 dark:text-green-400'; sign = '+'; }
+                    if (isWith) { colorClass = 'text-red-600 dark:text-red-400'; }
+
+                    list.innerHTML += `
+                        <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 p-5 rounded-xl flex justify-between items-center hover:bg-gray-50 dark:hover:bg-white/10 transition shadow-sm">
+                            <div>
+                                <p class="text-gray-900 dark:text-white font-bold tracking-wide">${tx.type}</p>
+                                <p class="text-xs text-gray-500 mt-1">${tx.date}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-lg ${colorClass}">${sign}₦${parseFloat(tx.amount).toLocaleString('en-NG', {minimumFractionDigits: 2})}</p>
+                                <p class="text-[10px] text-gray-400 mt-1 uppercase tracking-widest">${tx.details || 'Processed'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            openModal('history-modal');
+        }
+
+        function invest(planIndex) {
+            calculateAccruals(); // Calculate any pending returns first
+            const plan = investmentPlans[planIndex];
+            
+            if(user.balance < plan.price) return alert("Insufficient account balance. Please deposit funds.");
+            if(!confirm(`Authorize ₦${plan.price.toLocaleString()} for ${plan.name} Contract?`)) return;
+            
+            showLoading(() => {
+                user.balance -= plan.price;
+                
+                // Save active investment for continuous daily accrual
+                user.activeInvestments.push({
+                    name: plan.name,
+                    amount: plan.price,
+                    rate: plan.rate,
+                    lastAccrual: Date.now()
+                });
+
+                user.transactions.push({ 
+                    type: 'Refining Activation', 
+                    amount: plan.price, 
+                    date: new Date().toLocaleString(),
+                    details: plan.name
+                });
+                updateBalance();
+                alert(`Refining Protocol Initiated Successfully! You are now earning ${plan.returnText}.`);
+            });
+        }
+    </script>
+</body>
+</html>
